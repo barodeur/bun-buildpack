@@ -15,6 +15,7 @@ finished() {
 BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
+BP_DIR=$(cd "$(dirname "${0:-}")"; cd ..; pwd)
 
 echo_export_env_vars() {
   local BUN_INSTALL="$HOME/.bun"
@@ -32,12 +33,21 @@ write_profile_d_script() {
   finished
 }
 
+write_export() {
+  start "Creating export with env vars"
+    local export_path="${BP_DIR}/export"
+
+    echo_export_env_vars >> $export_path
+  finished
+}
+
 start "Installing Bun"
   curl -fsSL https://bun.sh/install | bash
 finished
 export BUN_INSTALL="$HOME/.bun" 
 export PATH="$BUN_INSTALL/bin:$PATH"
 write_profile_d_script
+write_export
 
 # Build the project
 cd $BUILD_DIR
